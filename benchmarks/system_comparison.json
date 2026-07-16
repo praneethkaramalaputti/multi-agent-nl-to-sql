@@ -1,0 +1,22 @@
+{
+  "baseline": {
+    "total_questions": 10,
+    "successful_executions": 6,
+    "execution_matches": 4,
+    "execution_errors": 6,
+    "execution_accuracy": 40.0,
+    "average_latency_seconds": 1.8818,
+    "average_attempts": 1
+  },
+  "multi_agent": {
+    "total_questions": 10,
+    "successful_executions": 10,
+    "execution_matches": 10,
+    "execution_errors": 0,
+    "execution_accuracy": 100.0,
+    "average_latency_seconds": 6.8216,
+    "average_attempts": 1.6
+  },
+  "accuracy_improvement_percentage_points": 60.0,
+  "error_reduction_percentage": 100.0
+}

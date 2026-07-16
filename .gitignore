@@ -1,0 +1,26 @@
+
+.venv/
+
+__pycache__/
+
+*.pyc
+
+.env
+
+.DS_Store
+
+*.db
+
+.pytest_cache/
+
+
+# SQLite databases
+*.sqlite
+*.sqlite3
+
+# Downloaded BIRD dataset
+data/minidev-complete/
+
+# Local logs
+*.log
+data/minidev.zip
