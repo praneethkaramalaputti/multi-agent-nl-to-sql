@@ -2,6 +2,7 @@ from typing import Any
 
 from app.agents.answer_generator import generate_natural_language_answer
 from app.agents.query_planner import create_query_plan
+from app.agents.result_verifier import verify_result
 from app.agents.sql_generator import generate_sql
 from app.agents.sql_repair import repair_sql
 from app.agents.sql_validator import validate_sql
@@ -157,6 +158,83 @@ def execute_sql_node(state: NLToSQLState) -> dict[str, Any]:
 
 
 
+
+def verify_query_result_node(
+    state: NLToSQLState,
+) -> dict[str, Any]:
+    result = state.get("result")
+
+    if not result:
+        verification = {
+            "is_valid": False,
+            "confidence": 0.0,
+            "failure_category": "null_result",
+            "reason": (
+                "No executed result was available "
+                "for semantic verification."
+            ),
+            "repair_instructions": [
+                "Execute the generated SQL before verification."
+            ],
+        }
+    else:
+        verification = verify_result(
+            question=state.get("question", ""),
+            evidence=state.get("evidence", ""),
+            query_plan=state.get("query_plan", {}),
+            generated_sql=state.get("generated_sql", ""),
+            result=result,
+        )
+
+    history = list(state.get("attempt_history", []))
+
+    history.append(
+        {
+            "attempt": state.get("attempt_count", 0),
+            "type": "result_verification",
+            "is_valid": verification.get(
+                "is_valid",
+                False,
+            ),
+            "confidence": verification.get(
+                "confidence",
+                0.0,
+            ),
+            "failure_category": verification.get(
+                "failure_category"
+            ),
+            "reason": verification.get("reason"),
+            "repair_instructions": verification.get(
+                "repair_instructions",
+                [],
+            ),
+        }
+    )
+
+    is_valid = verification.get("is_valid", False)
+
+    return {
+        "result_verification": verification,
+        "semantic_repair_instructions": verification.get(
+            "repair_instructions",
+            [],
+        ),
+        "attempt_history": history,
+        "status": (
+            "result_verified"
+            if is_valid
+            else "semantic_verification_failed"
+        ),
+        "failure_category": (
+            None
+            if is_valid
+            else verification.get(
+                "failure_category",
+                "semantic_mismatch",
+            )
+        ),
+    }
+
 def generate_answer_node(state: NLToSQLState) -> dict[str, Any]:
     try:
         answer = generate_natural_language_answer(
@@ -191,10 +269,32 @@ def repair_sql_node(state: NLToSQLState) -> dict[str, Any]:
     if execution_error:
         error_parts.append(execution_error)
 
+    result_verification = state.get("result_verification", {})
+    semantic_reason = result_verification.get("reason")
+    semantic_instructions = state.get(
+        "semantic_repair_instructions",
+        [],
+    )
+
+    if semantic_reason:
+        error_parts.append(
+            f"Semantic verification failure: {semantic_reason}"
+        )
+
+    if semantic_instructions:
+        error_parts.append(
+            "Semantic repair instructions:\n- "
+            + "\n- ".join(semantic_instructions)
+        )
+
     error_message = "\n".join(error_parts) or "Unknown SQL failure."
-    failure_category = classify_failure(
-        validation=validation,
-        execution_error=execution_error,
+
+    failure_category = (
+        result_verification.get("failure_category")
+        or classify_failure(
+            validation=validation,
+            execution_error=execution_error,
+        )
     )
 
     try:
@@ -227,6 +327,8 @@ def repair_sql_node(state: NLToSQLState) -> dict[str, Any]:
             "execution_error": None,
             "failure_category": None,
             "result": None,
+            "result_verification": {},
+            "semantic_repair_instructions": [],
             "status": "sql_repaired",
         }
 
@@ -258,3 +360,18 @@ def route_after_execution(state: NLToSQLState) -> str:
         return "repair"
 
     return "stop"
+
+
+
+def route_after_result_verification(
+    state: NLToSQLState,
+) -> str:
+    verification = state.get("result_verification", {})
+
+    if verification.get("is_valid", False):
+        return "answer"
+
+    if state.get("attempt_count", 0) < MAX_ATTEMPTS:
+        return "repair"
+
+    return "answer"

@@ -9,6 +9,8 @@ class NLToSQLState(TypedDict, total=False):
     generated_sql: str
     validation: dict[str, Any]
     result: dict[str, Any] | None
+    result_verification: dict[str, Any]
+    semantic_repair_instructions: list[str]
     natural_language_answer: str
     execution_error: str | None
     failure_category: str | None
