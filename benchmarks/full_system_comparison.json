@@ -1,0 +1,36 @@
+{
+  "evaluation_scope": {
+    "dataset": "BIRD Mini-Dev",
+    "database": "thrombosis_prediction",
+    "questions": 50
+  },
+  "single_agent_baseline": {
+    "total_questions": 50,
+    "successful_executions": 34,
+    "failed_executions": 16,
+    "execution_matches": 13,
+    "incorrect_queries": 37,
+    "execution_accuracy_percent": 26.0,
+    "average_latency_seconds": 1.86706
+  },
+  "multi_agent_system": {
+    "total_questions": 50,
+    "successful_executions": 49,
+    "failed_executions": 1,
+    "execution_matches": 23,
+    "incorrect_queries": 27,
+    "execution_accuracy_percent": 46.0,
+    "average_latency_seconds": 12.30338,
+    "queries_requiring_repair": 18,
+    "first_pass_matches": 15,
+    "first_pass_accuracy_percent": 30.0,
+    "average_attempts": 1.54
+  },
+  "improvements": {
+    "accuracy_percentage_points": 20.0,
+    "query_error_reduction_percent": 27.027027027027028,
+    "additional_correct_queries": 10,
+    "additional_successful_executions": 15,
+    "latency_multiplier": 6.589707882981801
+  }
+}
