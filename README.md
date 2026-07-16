@@ -1,4 +1,4 @@
-cat > README.md <<'EOF'
+
 # Multi-Agent NL-to-SQL System
 
 A multi-agent natural-language-to-SQL system that converts user questions into safe, executable SQL queries using LangGraph, Ollama, SQLGlot, SQLite, FastAPI, and Slack.
