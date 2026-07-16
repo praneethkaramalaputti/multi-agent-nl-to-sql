@@ -3,7 +3,7 @@ cat > README.md <<'EOF'
 
 A multi-agent natural-language-to-SQL system that converts user questions into safe, executable SQL queries using LangGraph, Ollama, SQLGlot, SQLite, FastAPI, and Slack.
 
-The system uses specialized agents for planning, SQL generation, validation, repair, execution, and natural-language answer generation.
+The system uses specialized agents for planning, SQL generation, validation, repair, execution, and natural-language answer generation
 
 ## Results
 
